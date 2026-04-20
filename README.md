@@ -28,25 +28,20 @@ of supported tile colors, activities, and sizes.
 If automatic credential fetching is not working (e.g. due to changes in Strava’s login flow), you can manually provide the required authentication values.
 
 Start by forking this repository and setting up the following GitHub secrets  
-(`github.com/you/strava-heatmap-proxy/settings/secrets/actions`):
+(`github.com/XXXXXXXX/strava-heatmap-proxy/settings/secrets/actions`):
 
 - `STRAVA_ID`
 - `STRAVA_COOKIES`
 - [`CF_ACCOUNT_ID`](https://developers.cloudflare.com/fundamentals/get-started/basic-tasks/find-account-and-zone-ids/)
 - [`CF_API_TOKEN`](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
 
-These secrets will be used by two GitHub Actions:
+These secrets will be used by two GitHub Actions.. 
 
-1. [deploy.yml](.github/workflows/deploy.yml): Deploy to Cloudflare on every
-   commit to `main`.
-2. push-strava-secrets.yml: Manually push `STRAVA_ID` and `STRAVA_COOKIES` to Cloudflare.
-
-To get started:
-
-1. Manually obtain valid `STRAVA_ID` and `STRAVA_COOKIES` (e.g. from your browser session).
-2. Add them as GitHub repository secrets.
-3. Run the **“Manually Push Strava AUTH to CF”** workflow from the Actions tab.
-4. Trigger the deploy workflow (e.g. via commit or manual run).
+1. Manually obtain valid `STRAVA_ID` and `STRAVA_COOKIES` using JOSM Chrome Browser extension. 
+2. Add them as GitHub repository secrets `STRAVA_ID` and `STRAVA_COOKIES`
+3. Retrieve CF_ACCOUNT_ID and CF_API_TOKEN from setting up an useraccount API Token using these permissions: Workers KV Storage:Edit, Workers Scripts:Edit, Account Settings:Read.
+4. Just edit any file in the repository and push the changes (e.g. README, just adding a few whitespaces) to make the Action deploy the Fork to a CF Worker.
+5. Trigger the workflow "02 Manually Push Strava AUTH to CF"
 
 Your site should now be live on  
-`strava-heatmap-proxy.YOUR-NAMESPACE.workers.dev`.
+`strava-heatmap-proxy.YOUR-NAMESPACE.workers.dev`, the exact link can be seen from the CF Dashboard under "Workers".
