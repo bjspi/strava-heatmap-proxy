@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare
+name: 01 Deploy to Cloudflare
 
 on:
   push:
