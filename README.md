@@ -23,13 +23,15 @@ template URLs to use:
 Check `https://strava-heatmap-proxy.YOUR_NAMESPACE.workers.dev/` for full list
 of supported tile colors, activities, and sizes.
 
-## The easy way
+## The manual but easy way
 
-Start by forking this repository and setting up some GitHub secrets
-(`github.com/you/strava-heatmap-proxy/settings/secrets/actions`).
+If automatic credential fetching is not working (e.g. due to changes in Strava’s login flow), you can manually provide the required authentication values.
 
-- `STRAVA_EMAIL`
-- `STRAVA_PASSWORD`
+Start by forking this repository and setting up the following GitHub secrets  
+(`github.com/you/strava-heatmap-proxy/settings/secrets/actions`):
+
+- `STRAVA_ID`
+- `STRAVA_COOKIES`
 - [`CF_ACCOUNT_ID`](https://developers.cloudflare.com/fundamentals/get-started/basic-tasks/find-account-and-zone-ids/)
 - [`CF_API_TOKEN`](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
 
@@ -37,52 +39,14 @@ These secrets will be used by two GitHub Actions:
 
 1. [deploy.yml](.github/workflows/deploy.yml): Deploy to Cloudflare on every
    commit to `main`.
-2. [credentials.yml](.github/workflows/credentials.yml): Fetch fresh Strava
-   cookies once per week.
+2. push-strava-secrets.yml: Manually push `STRAVA_ID` and `STRAVA_COOKIES` to Cloudflare.
 
-Trigger both of these actions for your first deploy, and you should be good to
-go. Your site should now be live on
+To get started:
+
+1. Manually obtain valid `STRAVA_ID` and `STRAVA_COOKIES` (e.g. from your browser session).
+2. Add them as GitHub repository secrets.
+3. Run the **“Manually Push Strava AUTH to CF”** workflow from the Actions tab.
+4. Trigger the deploy workflow (e.g. via commit or manual run).
+
+Your site should now be live on  
 `strava-heatmap-proxy.YOUR-NAMESPACE.workers.dev`.
-
-## Manual
-
-Requirements:
-
-  - [wrangler](https://github.com/cloudflare/wrangler) to manage Worker deployments
-  - [deno](https://deno.land) to run Strava authentication script
-
-Strava's API doesn't support this kind of access directly, so we'll need to
-log in with an email and password and grab session cookies for
-authentication.
-
-This can either be done manually in the browser or via
-`./scripts/refresh_strava_credentials.ts`
-
-``` console
-$ export STRAVA_EMAIL="my-strava-account@example.com"
-$ export STRAVA_PASSWORD="hunter2"
-$
-$ ./scripts/refresh_strava_credentials.ts
-STRAVA_ID=12345
-STRAVA_COOKIES=...
-```
-
-Now that we have these values, let's store them as Worker secrets.
-
-``` console
-$ wrangler login
-$ echo "1234" | wrangler secret put STRAVA_ID
-$ echo "...." | wrangler secret put STRAVA_COOKIES
-```
-
-Check that everything's working by running `wrangler dev`.
-
-Here's an example tile URL with some data:
-[/global/mobileblue/all/11/351/817@2x.png](http://127.0.0.1:8787/global/mobileblue/all/11/351/817@2x.png)
-(Downtown Los Angeles)
-
-When you're all set, use `wrangler publish` to bring the site live on
-`strava-heatmap-proxy.YOUR-NAMESPACE.workers.dev`
-
-Heads up, your credentials will expire after a few weeks, considering creating
-a periodic task to refresh them every 7 days or so.
